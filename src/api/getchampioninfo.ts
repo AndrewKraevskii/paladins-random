@@ -237,8 +237,15 @@ const getChampionsInfo = async (lang = 11) => {
     const responses = Promise.all(new Array(Math.ceil(heros / batch_size)).fill(0).map((_, i) =>
         fetch(`https://cms.paladins.com/wp-json/wp/v2/champions?page=${i + 1}&lang_id=${lang}`)
     ));
-    const res = (await responses).map(response => response.json());
-    const res2 = await Promise.all(res) as ChampionInfo[][]
-    return await res2.flat();
+    const json = (await responses).map(response => response.json());
+    const flatten = (await Promise.all(json) as ChampionInfo[][]).flat()
+    const shrinked = flatten.map(a => ({
+        api_information: a.api_information,
+        cards: a.cards,
+        id: a.id,
+        slug: a.slug
+    }))
+    return shrinked;
 }
+
 export {getChampionsInfo}
