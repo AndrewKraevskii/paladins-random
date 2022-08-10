@@ -1,19 +1,19 @@
 <script lang="ts" context="module">
-    export async function load({fetch}) {
-    const resp =  await fetch("/api");
-      return {
-        status: 200,
-        props: {
-            champions: await resp.json()
-        }
-      };
-    }
+	export async function load({ fetch }) {
+		const resp = await fetch('/api');
+		return {
+			status: 200,
+			props: {
+				champions: await resp.json()
+			}
+		};
+	}
 </script>
 
 <script lang="ts">
 	import Randomiser from '$lib/components/randomiser.svelte';
 	export let champions;
-    // console.log(champions);
+	// console.log(champions);
 </script>
 
 <!-- promise is pending -->

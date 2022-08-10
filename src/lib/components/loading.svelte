@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-    const maxdots = 3;
+	const maxdots = 3;
 	let dots = 3;
 	onMount(() => {
 		const id = setInterval(() => {
 			dots++;
 		}, 100);
 
-        return () => {
-            clearInterval(id);
-        }
+		return () => {
+			clearInterval(id);
+		};
 	});
 </script>
 

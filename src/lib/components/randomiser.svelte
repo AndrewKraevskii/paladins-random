@@ -6,10 +6,10 @@
 	let champion: {
 		name: string;
 		talent: string;
-        cards: {
-            name: string;
-            level: number
-        }[];
+		cards: {
+			name: string;
+			level: number;
+		}[];
 		items: string[];
 	} | null = null;
 
@@ -112,11 +112,13 @@
 		}
 
 		items = sample(items, 4);
-        const nums = getRandomNumbers(5, 1, 5);
+		const nums = getRandomNumbers(5, 1, 5);
 		champion = {
 			name,
 			talent: talant.card_name,
-			cards: cards.map((card, index)=>{return {name: card.card_name, level: nums[index]};}),
+			cards: cards.map((card, index) => {
+				return { name: card.card_name, level: nums[index] };
+			}),
 			items
 		};
 	}
