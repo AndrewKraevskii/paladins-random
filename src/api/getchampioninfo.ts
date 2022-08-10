@@ -230,8 +230,6 @@ export enum SkinRarity {
     Rare = "Rare",
 }
 
-
-
 const getChampionsInfo = async (lang = 11) => {
     const heros = (await getChampions()).length;
     const batch_size = 10;
