@@ -57,7 +57,7 @@
             items = items.filter(name => name !== "Мастер Езды")
         }
 		
-        const items = sample(
+        items = sample(
 			items,
 			4
 		);
