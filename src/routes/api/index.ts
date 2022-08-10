@@ -7,7 +7,7 @@ export async function GET() {
     {
         data = await getChampionsInfo();
         setTimeout(() => {
-
+            data = null;
         }, 24 * 3600 * 1000)
     }
     return {
