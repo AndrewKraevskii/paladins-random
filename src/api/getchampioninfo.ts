@@ -240,8 +240,13 @@ const getChampionsInfo = async (lang = 11) => {
     const json = (await responses).map(response => response.json());
     const flatten = (await Promise.all(json) as ChampionInfo[][]).flat()
     const shrinked = flatten.map(a => ({
-        api_information: a.api_information,
-        cards: a.cards,
+        api_information: {Name:a.api_information.Name},
+        cards: a.cards.map((card) => {
+            return {
+                card_name: card.card_name,
+                rarity: card.rarity
+            }
+        }),
         id: a.id,
         slug: a.slug
     }))
