@@ -11,6 +11,7 @@
 
 	let random_data: {
 		champion: {
+			slug: string;
 			name: string;
 			image: string;
 		};
@@ -26,6 +27,24 @@
 	} | null = null;
 
 	let generating = false;
+
+	
+	async function genCards() {
+		if (random_data === null || generating) return;
+		generating = true;
+		const cardinfo = (await (
+			await fetch(`/api/talants_and_cards/${random_data.champion.slug}?lang=${lang}`)
+			).json()) as CardInfo;
+		const random_cards = multyChoice(cardinfo.cards, 5);
+		const ranks = cardsRanks();
+		random_data!.cards = random_cards.map((card, index) => ({
+			name: card.name,
+			image: `https://webcdn.hirezstudios.com/paladins/champion-cards/${card.slug}.jpg`,
+			rank: ranks[index]
+		}))
+		random_data = random_data;
+		generating = false;
+	}
 	async function getRandom() {
 		if (generating) return;
 		generating = true;
@@ -43,7 +62,8 @@
 		random_data = {
 			champion: {
 				name: champion.name,
-				image: `https://webcdn.hirezstudios.com/paladins/champion-icons/${champion.slug}.jpg`
+				image: `https://webcdn.hirezstudios.com/paladins/champion-icons/${champion.slug}.jpg`,
+				slug: champion.slug
 			},
 			talant: {
 				name: talant.name,
@@ -79,7 +99,7 @@
 					{#each random_data?.cards ?? [] as card}
 						<li class="flex space-x-3">
 							<span class="text-4xl self-center">{card.rank}</span>
-							<img class="w-24" src={card.image} alt={card.name} />
+							<img class="w-24 h-20" src={card.image} alt={card.name} />
 							<span class="self-center">{card.name}</span>
 						</li>
 					{/each}
@@ -89,7 +109,10 @@
 				<span class="text-4xl">⟳</span>
 			{:else}
 				<button class="bg-cyan-800 p-2" disabled={generating} on:click={getRandom}
-					>{lang !== 'ru' ? 'Generate' : 'Перегенерировать'}</button
+					>{lang !== 'ru' ? 'Randomize All' : 'Рандомизировать всё'}</button
+				>
+				<button class="bg-cyan-800 p-2" disabled={generating} on:click={genCards}
+					>{lang !== 'ru' ? 'Randomize Cards' : 'Рандомизировать карты'}</button
 				>
 			{/if}
 		</div>
