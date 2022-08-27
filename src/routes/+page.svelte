@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Champion } from '$src/routes/api/champions/+server';
 	import type { Champion as CardInfo } from '$src/routes/api/talants_and_cards/[champion]/+server';
+import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 	import { cardsRanks, choice, multyChoice } from './utils';
 
@@ -32,50 +33,63 @@
 	async function genCards() {
 		if (random_data === null || generating) return;
 		generating = true;
-		const cardinfo = (await (
-			await fetch(`/api/talants_and_cards/${random_data.champion.slug}?lang=${lang}`)
-			).json()) as CardInfo;
-		const random_cards = multyChoice(cardinfo.cards, 5);
-		const ranks = cardsRanks();
-		random_data!.cards = random_cards.map((card, index) => ({
-			name: card.name,
-			image: `https://webcdn.hirezstudios.com/paladins/champion-cards/${card.slug}.jpg`,
-			rank: ranks[index]
-		}))
-		random_data = random_data;
-		generating = false;
+		try {
+
+			const cardinfo = (await (
+				await fetch(`/api/talants_and_cards/${random_data.champion.slug}?lang=${lang}`)
+				).json()) as CardInfo;
+				const random_cards = multyChoice(cardinfo.cards, 5);
+				const ranks = cardsRanks();
+				random_data!.cards = random_cards.map((card, index) => ({
+					name: card.name,
+					image: `https://webcdn.hirezstudios.com/paladins/champion-cards/${card.slug}.jpg`,
+					rank: ranks[index]
+				}))
+				random_data = random_data;
+				generating = false;
+		} catch {
+			generating = false;
+			setTimeout(genCards, 0);
+		}
 	}
 	async function getRandom() {
 		if (generating) return;
 		generating = true;
-		if (champions === null) {
-			champions = await (await fetch(`/api/champions?lang=${lang}`)).json();
-		}
-		const champion = choice(champions!);
-		const cardinfo = (await (
-			await fetch(`/api/talants_and_cards/${champion.slug}?lang=${lang}`)
-		).json()) as CardInfo;
 
-		const talant = choice(cardinfo.talants);
-		const random_cards = multyChoice(cardinfo.cards, 5);
-		const ranks = cardsRanks();
-		random_data = {
-			champion: {
-				name: champion.name,
-				image: `https://webcdn.hirezstudios.com/paladins/champion-icons/${champion.slug}.jpg`,
-				slug: champion.slug
-			},
-			talant: {
-				name: talant.name,
-				image: `https://webcdn.hirezstudios.com/paladins/champion-legendaries-badge/${talant.slug}.png`
-			},
-			cards: random_cards.map((card, index) => ({
-				name: card.name,
-				image: `https://webcdn.hirezstudios.com/paladins/champion-cards/${card.slug}.jpg`,
-				rank: ranks[index]
-			}))
-		};
-		generating = false;
+		try {
+
+			if (champions === null) {
+				champions = await (await fetch(`/api/champions?lang=${lang}`)).json();
+			}
+			const champion = choice(champions!);
+			const cardinfo = (await (
+				await fetch(`/api/talants_and_cards/${champion.slug}?lang=${lang}`)
+			).json()) as CardInfo;
+	
+			const talant = choice(cardinfo.talants);
+			const random_cards = multyChoice(cardinfo.cards, 5);
+			const ranks = cardsRanks();
+			random_data = {
+				champion: {
+					name: champion.name,
+					image: `https://webcdn.hirezstudios.com/paladins/champion-icons/${champion.slug}.jpg`,
+					slug: champion.slug
+				},
+				talant: {
+					name: talant.name,
+					image: `https://webcdn.hirezstudios.com/paladins/champion-legendaries-badge/${talant.slug}.png`
+				},
+				cards: random_cards.map((card, index) => ({
+					name: card.name,
+					image: `https://webcdn.hirezstudios.com/paladins/champion-cards/${card.slug}.jpg`,
+					rank: ranks[index]
+				}))
+			};
+			generating = false;
+		} catch {
+			generating = false;
+			setTimeout(getRandom, 0);
+		}
 	}
 
 	onMount(() => {
