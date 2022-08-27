@@ -52,7 +52,6 @@
 			cards: random_cards.map((card, index) => ({
 				name: card.name,
 				image: `https://webcdn.hirezstudios.com/paladins/champion-cards/${card.slug}.jpg`,
-				// TODO: make normal ranks
 				rank: ranks[index]
 			}))
 		};
