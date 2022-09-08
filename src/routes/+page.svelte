@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Champion } from '$src/routes/api/champions/+server';
 	import type { Champion as CardInfo } from '$src/routes/api/talants_and_cards/[champion]/+server';
-import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 	import { cardsRanks, choice, multyChoice } from './utils';
 
@@ -52,16 +51,15 @@ import { error } from '@sveltejs/kit';
 			setTimeout(genCards, 0);
 		}
 	}
-	async function getRandom() {
+	async function getRandom(champ: string | null = null) {
 		if (generating) return;
 		generating = true;
 
 		try {
-
 			if (champions === null) {
 				champions = await (await fetch(`/api/champions?lang=${lang}`)).json();
 			}
-			const champion = choice(champions!);
+			const champion = champions!.find((c)=>c.slug == champ) ?? choice(champions!);
 			const cardinfo = (await (
 				await fetch(`/api/talants_and_cards/${champion.slug}?lang=${lang}`)
 			).json()) as CardInfo;
@@ -91,13 +89,22 @@ import { error } from '@sveltejs/kit';
 			setTimeout(getRandom, 0);
 		}
 	}
-
+	function changeChampion() {
+		random_data = null;
+		getRandom(select.value);
+	}
+	let select: HTMLSelectElement;
 	onMount(() => {
 		getRandom();
 	});
 </script>
 
 <main class="flex flex-col items-center">
+	<select name="champion" on:change={changeChampion} bind:this={select}>
+		{#each champions ?? [] as champion}
+			<option value={champion.slug}>{champion.name}</option>
+		{/each}
+	</select>
 	<div class="container bg-teal-600 text-white">
 		<div class="flex flex-col items-center m-4 space-y-4">
 			<div class="flex space-x-3">
